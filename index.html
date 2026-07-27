@@ -25,8 +25,12 @@
   header .hanja { font-size: 15px; letter-spacing: 12px; color: var(--gold); }
   header h1 { font-size: 42px; letter-spacing: 16px; margin: 8px 0 12px; text-indent: 16px; }
   header p { color: #6b6154; font-size: 15px; }
-  .divider { display: flex; align-items: center; gap: 12px; margin: 28px 0; color: var(--gold); }
-  .divider::before, .divider::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
+  .part-title {
+    display: flex; align-items: center; gap: 12px;
+    margin: 34px 0 14px; color: var(--gold);
+    font-size: 15px; letter-spacing: 4px;
+  }
+  .part-title::before, .part-title::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
   .card {
     background: var(--paper);
     border: 1px solid var(--line);
@@ -56,6 +60,12 @@
     border-color: var(--accent);
     color: #fff;
   }
+  .saju-inputs { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .saju-inputs input, .saju-inputs select {
+    font-family: inherit; font-size: 15px;
+    padding: 8px 12px; border: 1px solid var(--line);
+    border-radius: 6px; background: #fff; color: var(--ink);
+  }
   .go {
     display: block;
     width: 100%;
@@ -81,10 +91,25 @@
     border-bottom: 1px solid var(--line);
     padding-bottom: 6px; margin-bottom: 10px;
   }
-  .r-section p { font-size: 15px; }
-  .seal {
-    text-align: center; margin-top: 28px;
+  .r-section p { font-size: 15px; margin-bottom: 8px; }
+  .pillars { width: 100%; border-collapse: collapse; margin: 10px 0 14px; text-align: center; }
+  .pillars th {
+    font-size: 13px; color: #8a7f6e; font-weight: 400;
+    border-bottom: 1px solid var(--line); padding: 6px;
   }
+  .pillars td { padding: 8px 6px; }
+  .pillars .gz { font-size: 26px; line-height: 1.3; }
+  .pillars .rd { font-size: 12px; color: #8a7f6e; }
+  .el-목 { color: #3c7a3c; } .el-화 { color: #b8392e; } .el-토 { color: #8a6d2f; }
+  .el-금 { color: #7d7d85; } .el-수 { color: #2e5d8a; }
+  .bars { margin: 8px 0 4px; }
+  .bar-row { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 4px; }
+  .bar-row .lb { width: 52px; }
+  .bar-row .tr { flex: 1; background: #efe8d8; border-radius: 4px; height: 12px; overflow: hidden; }
+  .bar-row .fl { height: 100%; border-radius: 4px; }
+  .fl-목 { background: #5a9a5a; } .fl-화 { background: #c95448; } .fl-토 { background: #b0904a; }
+  .fl-금 { background: #9a9aa3; } .fl-수 { background: #4a7cab; }
+  .seal { text-align: center; margin-top: 28px; }
   .seal span {
     display: inline-block;
     border: 2px solid var(--accent);
@@ -110,10 +135,34 @@
   <header>
     <div class="hanja">觀相</div>
     <h1>관상</h1>
-    <p>얼굴에는 살아온 길과 살아갈 길이 담겨 있다</p>
+    <p>얼굴에는 살아온 길과, 소리에는 타고난 기운이,<br>팔자에는 흐르는 운이 담겨 있다</p>
   </header>
 
   <div id="form"></div>
+
+  <div id="sajuCard" class="card">
+    <div class="q-title"><span class="num">十一</span>사주팔자 (선택)</div>
+    <div class="q-sub">생년월일시를 입력하면 사주 간지를 세워 관상과 함께 종합 풀이합니다. 비워두면 관상만 봅니다.</div>
+    <div class="saju-inputs">
+      <input type="date" id="birthDate" min="1920-01-01" max="2026-12-31">
+      <select id="birthHour">
+        <option value="">태어난 시 모름</option>
+        <option value="0">자시 (23:30~01:29)</option>
+        <option value="2">축시 (01:30~03:29)</option>
+        <option value="4">인시 (03:30~05:29)</option>
+        <option value="6">묘시 (05:30~07:29)</option>
+        <option value="8">진시 (07:30~09:29)</option>
+        <option value="10">사시 (09:30~11:29)</option>
+        <option value="12">오시 (11:30~13:29)</option>
+        <option value="14">미시 (13:30~15:29)</option>
+        <option value="16">신시 (15:30~17:29)</option>
+        <option value="18">유시 (17:30~19:29)</option>
+        <option value="20">술시 (19:30~21:29)</option>
+        <option value="22">해시 (21:30~23:29)</option>
+      </select>
+    </div>
+  </div>
+
   <button class="go" id="goBtn" disabled onclick="readFace()">관상 보기</button>
 
   <div id="result" class="card">
@@ -123,13 +172,15 @@
   </div>
 
   <p class="notice">
-    본 풀이는 『마의상법』 등 전통 관상학 문헌의 해석을 재구성한 것으로,<br>
-    과학적 근거가 아닌 <b>전통문화 · 오락</b>으로 즐겨 주세요.<br>
+    본 풀이는 『마의상법』 『비본상인법』 『적천수천미』 등 전통 문헌과<br>
+    한국역학교육센터 강의 내용을 학습해 재구성한 것으로, <b>전통문화 · 오락</b>으로 즐겨 주세요.<br>
+    사주 절기 경계는 근사치라 절기 전후(2월 초 등) 출생은 ±1일 오차가 있을 수 있습니다.<br>
     관상 최고의 가르침 — 관상(觀相)보다 심상(心相), 얼굴보다 마음이 운명을 만듭니다.
   </p>
 </div>
 
 <script>
+/* ---------- 문항: 얼굴 8 + 목소리 1 + 점 1 ---------- */
 const Q = [
   { key:"face", title:"얼굴형", sub:"전체적인 윤곽을 골라주세요", opts:{
     "둥근형":{trait:"원만하고 사교성이 좋아 사람이 모이는", w:{wealth:2,love:1}},
@@ -183,15 +234,111 @@ const Q = [
     "각졌다":{trait:"턱이 각져 지구력이 강한 대기만성의 상", w:{late:2,mid:1}},
     "뾰족한 편":{trait:"턱이 갸름하여 감각적이고 세련된 상", w:{early:1,late:-1}},
     "이중 턱":{trait:"턱이 넉넉하여 베풀수록 복이 커지는 상", w:{late:2,wealth:1}}
+  }},
+  { key:"voice", part:"소리", title:"목소리 — 성상(聲相)", sub:"『비본상인법』 성음편: 소리는 꾸미기 어려운 내면의 기운입니다", opts:{
+    "맑고 울림·여운이 있다":{w:{mid:2,wealth:1},
+      read:"종이 울리듯 맑고 여운(韻)이 남는 소리 — 성음 상법에서 으뜸으로 치는 귀상(貴相)의 소리입니다. 이름이 널리 울려 퍼질 상이니, 사람 앞에서 말하는 일(발표·영업·강의)에서 복이 열립니다."},
+    "깊고 힘있게 울린다":{w:{mid:1,late:1},
+      read:"단전에서 받쳐 나오는 깊은 소리 — 기(氣)가 실하다는 증거로 귀하게 봅니다. 목구멍이 아닌 배에서 나오는 소리는 건강과 뚝심의 표시이니, 큰일을 맡아도 흔들리지 않는 상입니다."},
+    "가늘고 조용하다":{w:{love:1},
+      read:"가늘고 조용한 소리 — 섬세하고 신중한 기운입니다. 다만 상법에서는 소리에 힘이 실려야 성취가 따른다 하니, 복식호흡으로 소리를 단전에서 끌어올리는 습관을 들이면 운도 함께 실해집니다."},
+    "말이 자주 끊기는 편":{w:{},
+      read:"말이 중간에 끊기는 것(단속斷續)은 기가 짧다는 신호로, 상법에서는 건강을 먼저 살피라 합니다. 호흡을 기르고 말끝을 분명히 맺는 연습을 하면 일의 마무리 운도 함께 좋아집니다."},
+    "몸집에 비해 소리가 큼":{w:{mid:1},
+      read:"작은 몸에서 큰 울림이 나오는 것은 속 기운이 실하다는 증거 — 상법에서는 오히려 귀하게 봅니다. 겉보기보다 훨씬 큰 그릇이니, 스스로를 작게 여기지 마세요."}
+  }},
+  { key:"mole", part:"점", title:"점(痣) — 지상(痣相)", sub:"『비본상인법』 점편: 점은 색과 광택, 그리고 위치로 봅니다", opts:{
+    "점이 거의 없다":{w:{},
+      read:"점이 없는 깨끗한 얼굴은 그 자체로 무난합니다. 상법도 말하기를, 눈이 맑고 코가 반듯하면 점이 없어도 이룰 재물은 다 이룬다 — 점은 어디까지나 보조 지표입니다."},
+    "숨은 자리에 윤나는 점":{w:{wealth:2,late:1},
+      read:"귀 안·몸의 감춰진 자리에 있는 윤기 있는 점은 상법에서 매우 귀하게 봅니다. 드러나지 않는 곳의 점은 감춰진 복 — 재물이 모이고 귀인이 숨어서 돕는 상입니다."},
+    "얼굴에 검고 윤나는 점":{w:{wealth:1},
+      read:"옻칠처럼 검고 윤이 나는 점(흑여칠黑如漆)은 얼굴의 점 중 길한 편에 듭니다. 다만 '면무선지(面無善痣)'라 하여 얼굴 점은 자리를 함께 보니, 그 부위의 궁(宮)이 뜻하는 일에서 개성이 강하게 드러납니다."},
+    "얼굴에 어둡고 탁한 점":{w:{},
+      read:"빛이 없고 탁한 점은 기혈이 눌린 표시로 봅니다. 상법의 처방은 뜻밖에 실용적입니다 — 거슬리는 흉지는 빼도 좋되, 근본은 몸과 마음을 다스려 기색을 밝히는 것이라 했습니다. 잠과 건강을 먼저 챙기세요."},
+    "코끝에 붉은 점·붉은 기":{w:{wealth:-1},
+      read:"코는 재백궁(재물 창고)인데 붉은 기운은 화기(火氣) — 화극금(火剋金)의 이치로 재물 창고를 불이 지지는 격이라 봅니다. 돈이 모였다 흩어지기 쉬우니 당분간 큰 지출과 투자를 삼가고 창고 단속(저축)에 힘쓰세요."},
+    "반점·검버섯이 늘었다":{w:{},
+      read:"반점은 점과 달리 혈(血)이 쉰 표시라, 상법은 운보다 건강을 먼저 살피라 합니다. 기혈이 돌면 옅어지는 것이니 — 잘 자고 잘 먹고 몸을 보하는 것이 곧 개운(開運)입니다."}
   }}
 ];
 
+/* ---------- 사주 데이터 ---------- */
+const STEMS = ["갑","을","병","정","무","기","경","신","임","계"];
+const STEMS_H = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
+const BRANCH = ["자","축","인","묘","진","사","오","미","신","유","술","해"];
+const BRANCH_H = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+const STEM_EL = ["목","목","화","화","토","토","금","금","수","수"];
+const BRANCH_EL = ["수","토","목","목","토","화","화","토","금","금","토","수"];
+const DAYMASTER = {
+  "갑":"큰 나무(甲木)의 기운 — 하늘로 곧게 뻗는 거목입니다. 리더십과 추진력을 타고났고, 굽히기보다 꺾이는 곧은 성품이니 명분이 서는 일에서 크게 자랍니다.",
+  "을":"화초·덩굴(乙木)의 기운 — 바위틈에서도 길을 찾아 자라는 유연함입니다. 적응력과 섬세한 감각이 무기이며, 부드러움으로 강함을 이기는 상입니다.",
+  "병":"태양(丙火)의 기운 — 만물을 비추는 밝음입니다. 열정적이고 표현이 시원하며 숨김이 없으니, 사람들 앞에 서서 비추는 자리에서 빛납니다.",
+  "정":"촛불·달빛(丁火)의 기운 — 어둠을 밝히는 따뜻한 불입니다. 섬세한 통찰과 헌신의 마음을 지녔고, 한 분야를 깊이 파고들어 대가가 되는 상입니다.",
+  "무":"큰 산(戊土)의 기운 — 만물을 품는 태산입니다. 듬직하고 신용이 두터워 사람들이 기대는 상이니, 중심을 지키는 자리에서 복이 큽니다.",
+  "기":"기름진 밭(己土)의 기운 — 씨앗을 길러내는 어머니 흙입니다. 포용력과 실속을 겸비했고, 사람을 키우고 살림을 불리는 데 능한 상입니다.",
+  "경":"무쇠·바위(庚金)의 기운 — 가을 서리의 숙살지기(肅殺之氣)입니다. 결단력과 의리가 강철 같으니, 맺고 끊는 일·개혁하는 일에서 진가가 드러납니다.",
+  "신":"보석(辛金)의 기운 — 다듬어진 주옥입니다. 예리한 안목과 자존심, 완벽을 향한 감각을 타고났으니 전문성으로 빛나는 상입니다.",
+  "임":"큰 강·바다(壬水)의 기운 — 쉼 없이 흐르는 큰물입니다. 지혜와 스케일이 크고 막히면 돌아갈 줄 아니, 넓은 물에서 놀수록 커지는 상입니다.",
+  "계":"이슬비·샘물(癸水)의 기운 — 스며들어 적시는 물입니다. 총명함과 풍부한 감수성으로 사람 마음에 스며드니, 지혜와 아이디어로 승부하는 상입니다."
+};
+const EL_LACK = {
+  "목":"목(木·성장)의 기운이 옅으니 새 일을 벌이는 결단이 더딜 수 있습니다. 초록·식물을 가까이하고 아침 시간을 쓰면 보완됩니다",
+  "화":"화(火·발산)의 기운이 옅으니 자기표현이 아쉬울 수 있습니다. 밝은 색과 햇볕, 사람 앞에 서는 연습이 보약입니다",
+  "토":"토(土·중심)의 기운이 옅으니 진득함이 아쉬울 수 있습니다. 한 자리를 오래 지키는 루틴이 운을 단단하게 합니다",
+  "금":"금(金·결실)의 기운이 옅으니 맺고 끊음이 아쉬울 수 있습니다. 마무리와 정리 습관이 재물을 지켜줍니다",
+  "수":"수(水·지혜)의 기운이 옅으니 쉬어가는 힘이 아쉬울 수 있습니다. 충분한 수면과 공부가 운의 밑천이 됩니다"
+};
+
+/* 절기 근사 경계: [월, 일, 월지index(인=0)] */
+const TERMS = [[1,6,11],[2,4,0],[3,6,1],[4,5,2],[5,6,3],[6,6,4],[7,7,5],[8,8,6],[9,8,7],[10,8,8],[11,7,9],[12,7,10]];
+
+function jdn(y,m,d){
+  const a = Math.floor((14-m)/12), yy = y+4800-a, mm = m+12*a-3;
+  return d + Math.floor((153*mm+2)/5) + 365*yy + Math.floor(yy/4) - Math.floor(yy/100) + Math.floor(yy/400) - 32045;
+}
+
+function calcSaju(y,m,d,hourVal){
+  // 시간이 자시(23시대)면 날짜를 하루 넘김
+  let jd = jdn(y,m,d);
+  let hb = null;
+  if (hourVal !== "") {
+    const h = parseInt(hourVal,10);       // 0=자,2=축,...22=해 (시작 브랜치 짝수값)
+    hb = h/2;                              // 지지 index 0~11
+    if (h === 0) jd += 0;                  // 야자시 논쟁은 단순화: 입력 슬롯 기준 그대로
+  }
+  // 일주
+  const di = ((jd + 49) % 60 + 60) % 60;
+  const dS = di % 10, dB = di % 12;
+  // 연주 (입춘 기준)
+  let ey = y;
+  if (m < 2 || (m === 2 && d < 4)) ey--;
+  const yS = ((ey - 4) % 10 + 10) % 10, yB = ((ey - 4) % 12 + 12) % 12;
+  // 월주 (절기 기준)
+  let mi = 10; // 기본: 축월
+  for (const [tm,td,idx] of TERMS) {
+    if (m > tm || (m === tm && d >= td)) mi = idx;
+  }
+  if (m === 1 && d < 6) mi = 10;           // 1/1~1/5는 전년 자월
+  const mS = ((yS % 5) * 2 + 2 + mi) % 10, mB = (mi + 2) % 12;
+  // 시주
+  let hS = null;
+  if (hb !== null) hS = ((dS % 5) * 2 + hb) % 10;
+  return { yS,yB,mS,mB,dS,dB,hS,hB:hb };
+}
+
+/* ---------- 렌더링 ---------- */
 const picked = {};
+const NUMS = ["一","二","三","四","五","六","七","八","九","十"];
 const form = document.getElementById("form");
+let lastPart = null;
 Q.forEach((q,i) => {
+  if (i === 0) { const t = document.createElement("div"); t.className="part-title"; t.textContent="얼굴의 상 面相"; form.appendChild(t); }
+  if (q.part === "소리") { const t = document.createElement("div"); t.className="part-title"; t.textContent="소리의 상 聲相"; form.appendChild(t); }
+  if (q.part === "점") { const t = document.createElement("div"); t.className="part-title"; t.textContent="점의 상 痣相"; form.appendChild(t); }
   const card = document.createElement("div");
   card.className = "card";
-  card.innerHTML = `<div class="q-title"><span class="num">${["一","二","三","四","五","六","七","八"][i]}</span>${q.title}</div>
+  card.innerHTML = `<div class="q-title"><span class="num">${NUMS[i]}</span>${q.title}</div>
     <div class="q-sub">${q.sub}</div>`;
   const opts = document.createElement("div");
   opts.className = "opts";
@@ -209,6 +356,10 @@ Q.forEach((q,i) => {
   card.appendChild(opts);
   form.appendChild(card);
 });
+// 사주 카드를 폼 뒤로 이동
+const sc = document.getElementById("sajuCard");
+const t = document.createElement("div"); t.className="part-title"; t.textContent="팔자의 상 四柱";
+form.appendChild(t); form.appendChild(sc);
 
 function grade(s) {
   if (s >= 4) return ["매우 좋음 ★★★★★", "크게 열려 있습니다"];
@@ -217,12 +368,61 @@ function grade(s) {
   return ["노력운 ★★", "스스로 만들어가는 운입니다 — 노력이 곧 복이 되는 상"];
 }
 
+function gzCell(s, b, label){
+  if (s === null) return `<td><div class="gz">?</div><div class="rd">${label}<br>시 모름</div></td>`;
+  return `<td>
+    <div class="gz"><span class="el-${STEM_EL[s]}">${STEMS_H[s]}</span><br><span class="el-${BRANCH_EL[b]}">${BRANCH_H[b]}</span></div>
+    <div class="rd">${label}<br>${STEMS[s]}${BRANCH[b]}</div>
+  </td>`;
+}
+
+function sajuHtml(p){
+  // 오행 집계
+  const cnt = {목:0,화:0,토:0,금:0,수:0};
+  const chars = [[p.yS,p.yB],[p.mS,p.mB],[p.dS,p.dB]];
+  if (p.hS !== null) chars.push([p.hS,p.hB]);
+  let total = 0;
+  chars.forEach(([s,b]) => { cnt[STEM_EL[s]]++; cnt[BRANCH_EL[b]]++; total += 2; });
+  const sorted = Object.entries(cnt).sort((a,b) => b[1]-a[1]);
+  const strong = sorted[0], weak = sorted[sorted.length-1];
+  const dm = STEMS[p.dS];
+
+  let bars = '<div class="bars">';
+  for (const el of ["목","화","토","금","수"]) {
+    const pct = Math.round(cnt[el]/total*100);
+    bars += `<div class="bar-row"><span class="lb">${el} ${({목:"木",화:"火",토:"土",금:"金",수:"水"})[el]} ${cnt[el]}</span><div class="tr"><div class="fl fl-${el}" style="width:${pct}%"></div></div></div>`;
+  }
+  bars += '</div>';
+
+  let balance;
+  if (strong[1] - weak[1] <= 1) {
+    balance = "다섯 기운이 고르게 퍼져 있는 균형 잡힌 팔자입니다. 오행이 두루 유통되면 큰 굴곡 없이 순리대로 풀리는 명이라 봅니다.";
+  } else {
+    balance = `<b>${strong[0]}(${({목:"木",화:"火",토:"土",금:"金",수:"水"})[strong[0]]})</b>의 기운이 가장 왕성합니다. `
+      + (weak[1] === 0
+        ? `반면 ${weak[0]} 기운이 비어 있으니 — ${EL_LACK[weak[0]]}.`
+        : `${weak[0]} 기운이 옅은 편이니 — ${EL_LACK[weak[0]]}.`);
+  }
+
+  return `
+    <table class="pillars">
+      <tr><th>시주(자식)</th><th>일주(나)</th><th>월주(부모형제)</th><th>연주(조상)</th></tr>
+      <tr>${gzCell(p.hS,p.hB,"時")}${gzCell(p.dS,p.dB,"日")}${gzCell(p.mS,p.mB,"月")}${gzCell(p.yS,p.yB,"年")}</tr>
+    </table>
+    <p><b>일간 ${dm}(${STEMS_H[p.dS]})</b> — ${DAYMASTER[dm]}</p>
+    ${bars}
+    <p>${balance}</p>`;
+}
+
 function readFace() {
   const score = { early:0, mid:0, late:0, wealth:0, love:0 };
   const traits = [];
+  let voiceRead = "", moleRead = "";
   Q.forEach(q => {
     const o = q.opts[picked[q.key]];
-    traits.push(o.trait);
+    if (q.key === "voice") voiceRead = o.read;
+    else if (q.key === "mole") moleRead = o.read;
+    else traits.push(o.trait);
     for (const k in o.w) score[k] += o.w[k];
   });
 
@@ -234,6 +434,21 @@ function readFace() {
 
   const best = Object.entries({초년운:score.early, 중년운:score.mid, 말년운:score.late})
     .sort((a,b) => b[1]-a[1])[0][0];
+
+  // 사주
+  let sajuSection = "", comboSection = "";
+  const bd = document.getElementById("birthDate").value;
+  if (bd) {
+    const [y,m,d] = bd.split("-").map(Number);
+    const p = calcSaju(y, m, d, document.getElementById("birthHour").value);
+    sajuSection = `<div class="r-section"><h3>사주팔자 — 타고난 기운</h3>${sajuHtml(p)}</div>`;
+    const dm = STEMS[p.dS];
+    comboSection = `<div class="r-section"><h3>관상 × 사주 종합</h3>
+      <p>얼굴의 상은 <b>${best}</b>이 가장 밝고, 타고난 일간은 <b>${dm}(${STEMS_H[p.dS]})</b>의 기운입니다.
+      ${DAYMASTER[dm].split("—")[1].trim().split(".")[0]}. 그 기질을 ${best === "초년운" ? "젊어서 일찍" : best === "중년운" ? "한창 일할 때" : "무르익은 뒤에"}
+      펼치는 그림이니, ${best === "말년운" ? "조급해하지 말고 길게 보는 것이" : "때가 왔을 때 주저 없이 나서는 것이"} 이 상을 제대로 쓰는 법입니다.
+      상(相)은 마음을 따라 변하니(相隨心生), 팔자는 밑그림일 뿐 — 채색은 스스로 하는 것입니다.</p></div>`;
+  }
 
   document.getElementById("resultBody").innerHTML = `
     <div class="r-section"><h3>총평</h3>
@@ -249,6 +464,10 @@ function readFace() {
       <p>재백궁(코)을 중심으로 보면, ${wt}. 콧방울이 탄탄할수록 모은 재물이 새지 않으니 씀씀이를 다스리면 금상첨화입니다.</p></div>
     <div class="r-section"><h3>애정운 — ${vg}</h3>
       <p>${traits[5]}입니다. 애정의 운은 ${vt}.</p></div>
+    <div class="r-section"><h3>소리의 상 (聲相)</h3><p>${voiceRead}</p></div>
+    <div class="r-section"><h3>점의 상 (痣相)</h3><p>${moleRead}</p></div>
+    ${sajuSection}
+    ${comboSection}
   `;
   document.getElementById("form").style.display = "none";
   document.getElementById("goBtn").style.display = "none";
