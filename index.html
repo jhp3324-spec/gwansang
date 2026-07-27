@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관상 — 얼굴로 읽는 운명</title>
+<style>
+  :root {
+    --bg: #f5efe3;
+    --paper: #fffdf7;
+    --ink: #2b2620;
+    --accent: #a4372e;
+    --gold: #b08d3e;
+    --line: #d9cdb4;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Noto Serif KR", "Nanum Myeongjo", serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.7;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 32px 20px 80px; }
+  header { text-align: center; padding: 40px 0 24px; }
+  header .hanja { font-size: 15px; letter-spacing: 12px; color: var(--gold); }
+  header h1 { font-size: 42px; letter-spacing: 16px; margin: 8px 0 12px; text-indent: 16px; }
+  header p { color: #6b6154; font-size: 15px; }
+  .divider { display: flex; align-items: center; gap: 12px; margin: 28px 0; color: var(--gold); }
+  .divider::before, .divider::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 22px 24px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 4px rgba(90,70,40,.07);
+  }
+  .q-title { font-weight: 700; font-size: 17px; margin-bottom: 4px; }
+  .q-title .num { color: var(--accent); margin-right: 8px; }
+  .q-sub { font-size: 13px; color: #8a7f6e; margin-bottom: 14px; }
+  .opts { display: flex; flex-wrap: wrap; gap: 8px; }
+  .opts button {
+    font-family: inherit;
+    font-size: 14px;
+    padding: 8px 16px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .opts button:hover { border-color: var(--gold); }
+  .opts button.on {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .go {
+    display: block;
+    width: 100%;
+    font-family: inherit;
+    font-size: 18px;
+    letter-spacing: 6px;
+    padding: 16px;
+    margin-top: 8px;
+    background: var(--ink);
+    color: #f2e9d8;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .go:hover { background: #443c32; }
+  .go:disabled { background: #b5aca0; cursor: not-allowed; }
+  #result { display: none; }
+  #result.show { display: block; animation: fade .6s; }
+  @keyframes fade { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; } }
+  .r-section { margin-bottom: 20px; }
+  .r-section h3 {
+    font-size: 16px; color: var(--accent);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 6px; margin-bottom: 10px;
+  }
+  .r-section p { font-size: 15px; }
+  .seal {
+    text-align: center; margin-top: 28px;
+  }
+  .seal span {
+    display: inline-block;
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    font-size: 13px;
+    padding: 6px 10px;
+    letter-spacing: 4px;
+  }
+  .notice {
+    font-size: 12.5px; color: #93887a; text-align: center;
+    margin-top: 36px; line-height: 1.8;
+  }
+  .retry {
+    display: block; margin: 24px auto 0;
+    font-family: inherit; font-size: 14px;
+    background: none; border: 1px solid var(--line);
+    border-radius: 999px; padding: 8px 22px; cursor: pointer; color: #6b6154;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="hanja">觀相</div>
+    <h1>관상</h1>
+    <p>얼굴에는 살아온 길과 살아갈 길이 담겨 있다</p>
+  </header>
+
+  <div id="form"></div>
+  <button class="go" id="goBtn" disabled onclick="readFace()">관상 보기</button>
+
+  <div id="result" class="card">
+    <div id="resultBody"></div>
+    <div class="seal"><span>觀相<br>心相</span></div>
+    <button class="retry" onclick="location.reload()">다시 보기</button>
+  </div>
+
+  <p class="notice">
+    본 풀이는 『마의상법』 등 전통 관상학 문헌의 해석을 재구성한 것으로,<br>
+    과학적 근거가 아닌 <b>전통문화 · 오락</b>으로 즐겨 주세요.<br>
+    관상 최고의 가르침 — 관상(觀相)보다 심상(心相), 얼굴보다 마음이 운명을 만듭니다.
+  </p>
+</div>
+
+<script>
+const Q = [
+  { key:"face", title:"얼굴형", sub:"전체적인 윤곽을 골라주세요", opts:{
+    "둥근형":{trait:"원만하고 사교성이 좋아 사람이 모이는", w:{wealth:2,love:1}},
+    "각진형":{trait:"의지와 실행력이 강해 조직의 기둥이 되는", w:{mid:2}},
+    "긴 형":{trait:"사려 깊고 인정이 많은 학자풍의", w:{early:1}},
+    "역삼각형":{trait:"두뇌 회전이 빠른 기획자형의", w:{early:2}},
+    "계란형":{trait:"균형 잡힌 다재다능한", w:{early:1,mid:1,late:1}}
+  }},
+  { key:"forehead", title:"이마 — 초년운의 자리", sub:"상정(上停), 15~30세의 운을 봅니다", opts:{
+    "넓고 둥글다":{trait:"이마가 넓고 둥글어 부모덕과 학운이 좋고 일찍 두각을 나타내는 상", w:{early:3}},
+    "높이 솟았다":{trait:"이마가 시원하게 솟아 관운(직장·명예운)이 강한 상", w:{early:2,mid:1}},
+    "좁은 편이다":{trait:"이마가 좁아 초년에는 스스로 길을 개척하는 자수성가의 상", w:{early:-1,mid:2}},
+    "M자형이다":{trait:"M자 이마로 논리적으로 파고드는 연구가의 상", w:{early:1,mid:1}}
+  }},
+  { key:"brow", title:"눈썹 — 형제운과 기질", sub:"형제궁(兄弟宮), 31~34세를 봅니다", opts:{
+    "길고 가지런":{trait:"눈썹이 길고 가지런하여 정이 많고 주변의 도움이 따르는 상", w:{early:1,love:2}},
+    "짙고 굵다":{trait:"눈썹이 짙어 의리와 추진력이 강한 상", w:{mid:2}},
+    "옅고 흐리다":{trait:"눈썹이 옅어 담백하고 계산이 빠르며 홀로서기에 능한 상", w:{wealth:1}},
+    "일자형":{trait:"일자 눈썹으로 강직하고 결단력 있는 상", w:{mid:1}},
+    "초승달형":{trait:"초승달 눈썹으로 온화하고 예술적 감각이 뛰어난 상", w:{love:2}}
+  }},
+  { key:"eye", title:"눈 — 마음의 창", sub:"얼굴의 절반은 눈. 35~40세를 봅니다", opts:{
+    "크고 또렷":{trait:"눈이 크고 또렷하여 감수성과 표현력이 풍부한 상", w:{love:2,early:1}},
+    "가늘고 길다":{trait:"눈이 가늘고 길어 관찰력과 인내심을 갖춘 전략가의 상", w:{mid:2,wealth:1}},
+    "눈꼬리가 올라감":{trait:"눈꼬리가 올라가 승부욕과 자존심이 강한 상", w:{mid:2}},
+    "눈꼬리가 처짐":{trait:"눈꼬리가 순하게 내려와 인복이 두터운 상", w:{love:2,late:1}},
+    "애교살이 도톰":{trait:"와잠(애교살)이 도톰하여 정이 많고 자녀 복이 있는 상", w:{late:2,love:1}}
+  }},
+  { key:"nose", title:"코 — 재물의 창고", sub:"재백궁(財帛宮), 41~50세를 봅니다", opts:{
+    "코끝이 둥글고 두툼":{trait:"준두(코끝)가 둥글고 두툼한 최고의 재물상", w:{wealth:3,mid:2}},
+    "높고 곧다":{trait:"콧대가 높고 곧아 자존심과 주관이 뚜렷한 리더의 상", w:{mid:2,wealth:1}},
+    "낮은 편":{trait:"코가 낮아 협조적이고 유연하여 두루 어울리는 상", w:{love:1}},
+    "매부리형":{trait:"매부리코로 사업 수완과 승부사 기질을 타고난 상", w:{wealth:2}},
+    "콧방울이 탄탄":{trait:"콧방울이 탄탄해 모은 재물을 굳게 지키는 상", w:{wealth:2,late:1}}
+  }},
+  { key:"mouth", title:"입 — 애정과 식복", sub:"51~60세, 말년의 입구를 봅니다", opts:{
+    "크고 뚜렷":{trait:"입이 크고 윤곽이 뚜렷하여 포부와 식복이 큰 상", w:{late:2,wealth:1}},
+    "작고 단정":{trait:"입이 작고 단정하여 섬세하고 신중한 상", w:{love:1}},
+    "입꼬리가 올라감":{trait:"입꼬리가 올라가 말년으로 갈수록 운이 피는 상", w:{late:3,love:1}},
+    "입술이 도톰":{trait:"입술이 도톰하여 정이 깊고 애정운이 풍부한 상", w:{love:3}},
+    "입술이 얇음":{trait:"입술이 얇아 이성적이고 언변이 좋은 상", w:{mid:1}}
+  }},
+  { key:"ear", title:"귀 — 복과 지혜", sub:"1~14세 유년운과 타고난 복을 봅니다", opts:{
+    "크고 두툼":{trait:"귀가 크고 두툼하여 복과 장수를 타고난 상", w:{late:2,early:1}},
+    "귓불이 도톰":{trait:"귓불이 도톰한 부처님 귀로 재물과 인덕이 따르는 상", w:{wealth:2,love:1}},
+    "얇은 편":{trait:"귀가 얇아 감각이 예민하고 흐름을 빨리 읽는 상", w:{early:1}},
+    "정면에서 잘 안 보임":{trait:"칩거이(정면에서 안 보이는 귀)로 신중하고 속이 깊은 부귀의 상", w:{wealth:2,mid:1}}
+  }},
+  { key:"chin", title:"턱 — 말년의 터전", sub:"노복궁(奴僕宮), 61세 이후를 봅니다", opts:{
+    "둥글고 두툼":{trait:"턱이 둥글고 두툼하여 말년이 풍요롭고 아랫사람 덕이 있는 상", w:{late:3}},
+    "각졌다":{trait:"턱이 각져 지구력이 강한 대기만성의 상", w:{late:2,mid:1}},
+    "뾰족한 편":{trait:"턱이 갸름하여 감각적이고 세련된 상", w:{early:1,late:-1}},
+    "이중 턱":{trait:"턱이 넉넉하여 베풀수록 복이 커지는 상", w:{late:2,wealth:1}}
+  }}
+];
+
+const picked = {};
+const form = document.getElementById("form");
+Q.forEach((q,i) => {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `<div class="q-title"><span class="num">${["一","二","三","四","五","六","七","八"][i]}</span>${q.title}</div>
+    <div class="q-sub">${q.sub}</div>`;
+  const opts = document.createElement("div");
+  opts.className = "opts";
+  Object.keys(q.opts).forEach(name => {
+    const b = document.createElement("button");
+    b.textContent = name;
+    b.onclick = () => {
+      opts.querySelectorAll("button").forEach(x => x.classList.remove("on"));
+      b.classList.add("on");
+      picked[q.key] = name;
+      document.getElementById("goBtn").disabled = Object.keys(picked).length < Q.length;
+    };
+    opts.appendChild(b);
+  });
+  card.appendChild(opts);
+  form.appendChild(card);
+});
+
+function grade(s) {
+  if (s >= 4) return ["매우 좋음 ★★★★★", "크게 열려 있습니다"];
+  if (s >= 2) return ["좋음 ★★★★", "순탄하게 풀려갑니다"];
+  if (s >= 1) return ["무난 ★★★", "평온한 흐름입니다"];
+  return ["노력운 ★★", "스스로 만들어가는 운입니다 — 노력이 곧 복이 되는 상"];
+}
+
+function readFace() {
+  const score = { early:0, mid:0, late:0, wealth:0, love:0 };
+  const traits = [];
+  Q.forEach(q => {
+    const o = q.opts[picked[q.key]];
+    traits.push(o.trait);
+    for (const k in o.w) score[k] += o.w[k];
+  });
+
+  const [eg, et] = grade(score.early);
+  const [mg, mt] = grade(score.mid);
+  const [lg, lt] = grade(score.late);
+  const [wg, wt] = grade(score.wealth);
+  const [vg, vt] = grade(score.love);
+
+  const best = Object.entries({초년운:score.early, 중년운:score.mid, 말년운:score.late})
+    .sort((a,b) => b[1]-a[1])[0][0];
+
+  document.getElementById("resultBody").innerHTML = `
+    <div class="r-section"><h3>총평</h3>
+      <p>${traits[0]} 얼굴입니다. ${traits[3]}이요, ${traits[4]}입니다.
+      삼정(三停)으로 보아 <b>${best}</b>이 가장 크게 빛나는 상이니, 그 시기에 승부를 거시면 좋겠습니다.</p></div>
+    <div class="r-section"><h3>초년운 (15~30세) — ${eg}</h3>
+      <p>${traits[1]}입니다. ${traits[6]}이니, 초년의 운은 ${et}.</p></div>
+    <div class="r-section"><h3>중년운 (31~50세) — ${mg}</h3>
+      <p>${traits[2]}이요, ${traits[3]}입니다. 중년의 운은 ${mt}.</p></div>
+    <div class="r-section"><h3>말년운 (51세~) — ${lg}</h3>
+      <p>${traits[7]}입니다. 말년의 운은 ${lt}.</p></div>
+    <div class="r-section"><h3>재물운 — ${wg}</h3>
+      <p>재백궁(코)을 중심으로 보면, ${wt}. 콧방울이 탄탄할수록 모은 재물이 새지 않으니 씀씀이를 다스리면 금상첨화입니다.</p></div>
+    <div class="r-section"><h3>애정운 — ${vg}</h3>
+      <p>${traits[5]}입니다. 애정의 운은 ${vt}.</p></div>
+  `;
+  document.getElementById("form").style.display = "none";
+  document.getElementById("goBtn").style.display = "none";
+  document.getElementById("result").classList.add("show");
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+</script>
+</body>
+</html>
